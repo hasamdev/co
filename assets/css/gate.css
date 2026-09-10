@@ -1,0 +1,138 @@
+/* ============================================================
+   Access gate — shown in place of a token-protected app.
+   Tokens only; no raw brand values live here. Loaded on gated
+   pages only (see inc/enqueue.php).
+   ============================================================ */
+
+.co-gate {
+	padding-block: var(--space-2xl);
+}
+
+.co-gate__eyebrow {
+	margin: 0 0 var(--space-xs);
+	font-size: var(--text-sm);
+	font-weight: 600;
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+	color: var(--color-accent);
+}
+
+.co-gate__title {
+	margin: 0 0 var(--space-sm);
+	font-family: var(--font-display);
+	font-size: var(--text-2xl);
+	line-height: var(--leading-tight);
+}
+
+.co-gate__lede {
+	max-width: 62ch;
+	margin: 0 0 var(--space-xl);
+	font-size: var(--text-md);
+	line-height: var(--leading-body);
+	color: var(--text-muted);
+}
+
+.co-gate__grid {
+	display: grid;
+	gap: var(--space-lg);
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+	align-items: start;
+}
+
+.co-gate__panel {
+	padding: var(--space-lg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	background: var(--bg-surface);
+	box-shadow: var(--shadow-sm);
+}
+
+.co-gate__panel--unlock {
+	border-color: var(--color-accent);
+}
+
+.co-gate__panel h2 {
+	margin: 0 0 var(--space-xs);
+	font-family: var(--font-display);
+	font-size: var(--text-lg);
+	line-height: var(--leading-tight);
+}
+
+.co-gate__panel > p {
+	margin: 0 0 var(--space-md);
+	color: var(--text-muted);
+}
+
+.co-gate__form {
+	margin: 0;
+}
+
+.co-gate__label {
+	display: block;
+	margin-bottom: var(--space-2xs);
+	font-size: var(--text-sm);
+	font-weight: 600;
+}
+
+.co-gate__input {
+	display: block;
+	width: 100%;
+	margin-bottom: var(--space-md);
+	padding: var(--space-sm) var(--space-md);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	background: var(--bg-page);
+	font: inherit;
+	color: inherit;
+}
+
+.co-gate__input:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 1px;
+}
+
+#co-token {
+	font-family: var(--font-mono);
+	font-size: var(--text-md);
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+}
+
+.co-gate__submit {
+	width: 100%;
+	justify-content: center;
+	text-align: center;
+}
+
+.co-gate__alt {
+	margin: var(--space-md) 0 0;
+	font-size: var(--text-sm);
+}
+
+.co-gate__notice {
+	margin: 0 0 var(--space-md);
+	padding: var(--space-sm) var(--space-md);
+	border-left: 3px solid currentcolor;
+	border-radius: var(--radius-sm);
+	font-size: var(--text-sm);
+	line-height: var(--leading-body);
+}
+
+.co-gate__notice--bad {
+	background: color-mix(in srgb, #e5372b 8%, transparent);
+	color: #a02318;
+}
+
+.co-gate__notice--ok {
+	background: color-mix(in srgb, #2c6e5b 10%, transparent);
+	color: #1d4a3d;
+}
+
+/* Off-screen rather than display:none — some bots skip hidden inputs. */
+.co-gate__hp {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}

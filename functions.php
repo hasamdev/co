@@ -21,6 +21,10 @@ $co_includes = array(
 	'inc/helpers.php',    // Template helpers (co_field, co_section, co_component...).
 	'inc/security.php',   // Hardening & head cleanup.
 	'inc/launch-form.php', // Front-page launch-list signup handler.
+	'inc/access.php',       // Token store & session for the gated apps.
+	'inc/apps.php',         // Gated app registry, routing and serving.
+	'inc/access-request.php', // "Request access" relay on the gate page.
+	'inc/admin-tokens.php', // Tools → App access.
 );
 
 foreach ( $co_includes as $co_file ) {

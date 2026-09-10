@@ -1,0 +1,15 @@
+# Block direct access to the gated app files.
+#
+# These documents must only ever be served through the theme's access
+# gate (inc/apps.php). Apache honours this file; nginx does NOT — see
+# the nginx block in inc/access.php's header comment and add it to the
+# server config by hand.
+
+<IfModule mod_authz_core.c>
+	Require all denied
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+	Order allow,deny
+	Deny from all
+</IfModule>

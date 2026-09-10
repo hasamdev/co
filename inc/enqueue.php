@@ -58,6 +58,16 @@ function co_enqueue_assets(): void {
 		wp_enqueue_script( 'comment-reply' );
 	}
 
+	// Access gate for the token-protected apps.
+	if ( function_exists( 'co_app_for_query' ) && co_app_for_query() ) {
+		wp_enqueue_style(
+			'co-gate',
+			CO_THEME_URI . '/assets/css/gate.css',
+			array( 'co-main' ),
+			co_asset_version( 'assets/css/gate.css' )
+		);
+	}
+
 	// Front page (Cypher-One launch layout) only.
 	if ( is_front_page() ) {
 		wp_enqueue_style(

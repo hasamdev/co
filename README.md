@@ -37,10 +37,15 @@ co/
 │   ├── enqueue.php      Assets with filemtime cache-busting in WP_DEBUG
 │   ├── acf.php          JSON sync, options page, missing-ACF notice
 │   ├── helpers.php      co_field(), co_section(), co_component(), co_page_builder()
-│   └── security.php     Head cleanup, XML-RPC off, REST users hidden, vague login errors
+│   ├── security.php     Head cleanup, XML-RPC off, REST users hidden, vague login errors
+│   ├── access.php       24-hour token store, signed session cookie, throttling
+│   ├── apps.php         Gated app registry, routing, serving
+│   └── admin-tokens.php Tools → App access (issue / review / revoke)
 ├── components/          Small reusable partials (button, card, nav)
 ├── sections/            Page-builder layouts, one file per ACF layout
 ├── acf-json/            Field groups as JSON — versioned, synced across environments
+├── apps/                Self-contained gated tools, served whole behind a token
+├── template-access-gate.php  Token gate shown in place of a gated app
 ├── assets/
 │   ├── css/variables.css  Design tokens — the ONLY place brand values live
 │   ├── css/main.css       Base, layout, components, sections
@@ -74,6 +79,83 @@ co/
 - **Calculator:** `assets/js/roi-calculator.js`; formula is `team × hours/week × 4 × hourly cost`, savings at 80%.
 - **Signup form:** posts to `admin-post.php` with nonce + honeypot; entries are stored (deduped, capped) and listed under **Tools → Launch list**, with an email notification to the admin. Swap the storage block in `inc/launch-form.php` for your ESP/CRM when chosen.
 - **Assets:** `front-page.css` and `roi-calculator.js` load only on the front page. The global site header is hidden there by design; the footer gains the centered brand mark.
+
+## Gated tools (Smart AI Readiness · Smart AI Governance)
+
+Two self-contained assessment apps ship in `apps/` and are served behind a
+24-hour token gate.
+
+```
+apps/
+├── .htaccess                    denies direct access (Apache only — see below)
+├── smart-ai-readiness.html      Smart AI Readiness   (Assessment v1.10)
+└── smart-ai-governance.html     Smart AI Governance  (QAGI build 43)
+```
+
+### How it works
+
+Each app is a complete HTML document with its own fonts, global CSS and (for
+governance) its own React runtime. They are **served byte-for-byte**, not
+folded into theme templates — so updating one is just replacing the file.
+
+A page becomes a tool by picking it in the **Gated app** box on the page edit
+screen (post meta `_co_app`). From then on:
+
+| Visitor state | What they get |
+|---|---|
+| No token | The access gate (`template-access-gate.php`) |
+| Live token | The app, with a small "← Cypher-One" pill injected |
+| Logged in as editor | The app, no token needed |
+
+Both pages are created automatically on first load of the admin, titled
+**Smart AI Readiness** and **Smart AI Governance**, and added to the Primary
+menu when one is already assigned. Otherwise add them under **Appearance →
+Menus** — they appear in the Pages box.
+
+### Issuing a token
+
+**Tools → App access.** Choose the tool, note who it is for, click *Issue
+token*. You get the token plus a ready-to-send reply containing a magic link:
+
+```
+https://example.com/smart-ai-readiness/?token=ABCD-EFGH-JKLM
+```
+
+The link signs the recipient in and the token is stripped from the URL
+immediately. Only an HMAC of the token is stored, so **it is shown once and
+cannot be recovered** — copy it before navigating away. If lost, issue another.
+
+- **24 hours from issue**, not from first use. The session cookie expires at
+  the same instant, so it can never outlive the token.
+- **Revoke is immediate** — every gated request re-reads the row.
+- Multi-use within the window by default, so people can reload or switch
+  device. Set the use limit to `1` to make a token strictly single-use.
+- Failed attempts are throttled to 8 per IP per 15 minutes.
+
+Visitors without a token are told to email **contact@cypher-one.ai**, and can
+send that request straight from the gate. Change the address with:
+
+```php
+add_filter( 'co_access_contact_email', fn() => 'hello@example.com' );
+```
+
+### ⚠️ nginx: one manual step
+
+`apps/.htaccess` blocks direct access to the raw files on Apache. **nginx
+ignores it**, which would leave the apps readable at
+`/wp-content/themes/co/apps/smart-ai-readiness.html`, bypassing the gate.
+On nginx (including LocalWP's default) add:
+
+```nginx
+location ~* /wp-content/themes/co/apps/.*\.html$ {
+    deny all;
+}
+```
+
+### Updating an app
+
+Drop the new export over the existing file, keeping the filename. Nothing
+else changes. To register a third tool, filter `co_apps`.
 
 ## Production notes
 
