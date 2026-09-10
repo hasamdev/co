@@ -1,0 +1,84 @@
+{
+    "key": "group_co_front_page",
+    "title": "Front page",
+    "fields": [
+        {
+            "key": "field_co_fp_bg_video",
+            "label": "Background video",
+            "name": "co_bg_video",
+            "type": "file",
+            "instructions": "MP4\/WebM shown behind the whole page. Upload to the Media Library to self-host; leave empty to use the built-in fallback video.",
+            "return_format": "url",
+            "library": "all",
+            "mime_types": "mp4,webm",
+            "required": 0
+        },
+        {
+            "key": "field_co_fp_hero_heading",
+            "label": "Hero heading",
+            "name": "co_hero_heading",
+            "type": "text",
+            "instructions": "Leave empty to use the default headline.",
+            "required": 0
+        },
+        {
+            "key": "field_co_fp_hero_subheading",
+            "label": "Hero subheading",
+            "name": "co_hero_subheading",
+            "type": "textarea",
+            "rows": 3,
+            "new_lines": "",
+            "required": 0
+        },
+        {
+            "key": "field_co_fp_partner_logos",
+            "label": "Partner logos",
+            "name": "co_partner_logos",
+            "type": "gallery",
+            "instructions": "White or light SVG\/PNG marks work best. Leave empty to show placeholder slots.",
+            "return_format": "array",
+            "preview_size": "medium",
+            "insert": "append",
+            "required": 0
+        },
+        {
+            "key": "field_co_fp_calc_heading",
+            "label": "Calculator heading",
+            "name": "co_calc_heading",
+            "type": "text",
+            "required": 0
+        },
+        {
+            "key": "field_co_fp_calc_subheading",
+            "label": "Calculator subheading",
+            "name": "co_calc_subheading",
+            "type": "text",
+            "required": 0
+        },
+        {
+            "key": "field_co_fp_signup_heading",
+            "label": "Signup heading",
+            "name": "co_signup_heading",
+            "type": "text",
+            "required": 0
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_type",
+                "operator": "==",
+                "value": "front_page"
+            }
+        ]
+    ],
+    "menu_order": 1,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Editable copy for the Cypher-One front page. All fields fall back to the design defaults.",
+    "show_in_rest": 0
+}

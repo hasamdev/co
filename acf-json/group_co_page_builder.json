@@ -1,0 +1,258 @@
+{
+    "key": "group_co_page_builder",
+    "title": "Page builder",
+    "fields": [
+        {
+            "key": "field_co_sections",
+            "label": "Sections",
+            "name": "sections",
+            "type": "flexible_content",
+            "instructions": "Build the page by stacking sections. Each layout maps to a template in \/sections\/.",
+            "required": 0,
+            "button_label": "Add section",
+            "layouts": {
+                "layout_co_hero": {
+                    "key": "layout_co_hero",
+                    "name": "hero",
+                    "label": "Hero",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_co_hero_eyebrow",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "instructions": "Small label above the heading. Optional.",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_hero_heading",
+                            "label": "Heading",
+                            "name": "heading",
+                            "type": "text",
+                            "required": 1
+                        },
+                        {
+                            "key": "field_co_hero_lede",
+                            "label": "Lede",
+                            "name": "lede",
+                            "type": "textarea",
+                            "rows": 3,
+                            "new_lines": "",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_hero_image",
+                            "label": "Background image",
+                            "name": "image",
+                            "type": "image",
+                            "return_format": "array",
+                            "preview_size": "medium",
+                            "instructions": "Optional. When set, the hero renders on an ink overlay.",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_hero_buttons",
+                            "label": "Buttons",
+                            "name": "buttons",
+                            "type": "repeater",
+                            "layout": "table",
+                            "max": 2,
+                            "button_label": "Add button",
+                            "sub_fields": [
+                                {
+                                    "key": "field_co_hero_button_link",
+                                    "label": "Button",
+                                    "name": "button",
+                                    "type": "link",
+                                    "return_format": "array",
+                                    "required": 1
+                                },
+                                {
+                                    "key": "field_co_hero_button_style",
+                                    "label": "Style",
+                                    "name": "style",
+                                    "type": "select",
+                                    "choices": {
+                                        "solid": "Solid",
+                                        "ghost": "Ghost"
+                                    },
+                                    "default_value": "solid",
+                                    "required": 0
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "layout_co_content": {
+                    "key": "layout_co_content",
+                    "name": "content",
+                    "label": "Rich content",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_co_content_eyebrow",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_content_heading",
+                            "label": "Heading",
+                            "name": "heading",
+                            "type": "text",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_content_body",
+                            "label": "Body",
+                            "name": "body",
+                            "type": "wysiwyg",
+                            "tabs": "all",
+                            "toolbar": "full",
+                            "media_upload": 1,
+                            "required": 1
+                        }
+                    ]
+                },
+                "layout_co_features": {
+                    "key": "layout_co_features",
+                    "name": "features",
+                    "label": "Features grid",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_co_features_eyebrow",
+                            "label": "Eyebrow",
+                            "name": "eyebrow",
+                            "type": "text",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_features_heading",
+                            "label": "Heading",
+                            "name": "heading",
+                            "type": "text",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_features_intro",
+                            "label": "Intro",
+                            "name": "intro",
+                            "type": "textarea",
+                            "rows": 2,
+                            "new_lines": "",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_features_items",
+                            "label": "Items",
+                            "name": "items",
+                            "type": "repeater",
+                            "layout": "block",
+                            "min": 1,
+                            "button_label": "Add feature",
+                            "sub_fields": [
+                                {
+                                    "key": "field_co_features_item_title",
+                                    "label": "Title",
+                                    "name": "title",
+                                    "type": "text",
+                                    "required": 1
+                                },
+                                {
+                                    "key": "field_co_features_item_text",
+                                    "label": "Text",
+                                    "name": "text",
+                                    "type": "textarea",
+                                    "rows": 3,
+                                    "new_lines": "",
+                                    "required": 0
+                                }
+                            ]
+                        }
+                    ]
+                },
+                "layout_co_cta": {
+                    "key": "layout_co_cta",
+                    "name": "cta",
+                    "label": "Call to action",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_co_cta_heading",
+                            "label": "Heading",
+                            "name": "heading",
+                            "type": "text",
+                            "required": 1
+                        },
+                        {
+                            "key": "field_co_cta_text",
+                            "label": "Text",
+                            "name": "text",
+                            "type": "textarea",
+                            "rows": 3,
+                            "new_lines": "",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_cta_button",
+                            "label": "Button",
+                            "name": "button",
+                            "type": "link",
+                            "return_format": "array",
+                            "required": 0
+                        }
+                    ]
+                },
+                "layout_co_posts": {
+                    "key": "layout_co_posts",
+                    "name": "posts",
+                    "label": "Latest posts",
+                    "display": "block",
+                    "sub_fields": [
+                        {
+                            "key": "field_co_posts_heading",
+                            "label": "Heading",
+                            "name": "heading",
+                            "type": "text",
+                            "default_value": "Latest stories",
+                            "required": 0
+                        },
+                        {
+                            "key": "field_co_posts_count",
+                            "label": "Number of posts",
+                            "name": "count",
+                            "type": "number",
+                            "default_value": 3,
+                            "min": 1,
+                            "max": 12,
+                            "required": 0
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "post_type",
+                "operator": "==",
+                "value": "page"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "seamless",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": [
+        "the_content"
+    ],
+    "active": true,
+    "description": "Cypher One flexible-content page builder.",
+    "show_in_rest": 0
+}

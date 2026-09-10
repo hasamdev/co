@@ -1,0 +1,20 @@
+/*
+Theme Name:        Cypher One
+Theme URI:         https://narrativehouse.co
+Author:            Narrative House
+Author URI:        https://narrativehouse.co
+Description:       Narrative House starter theme. A production-ready, ACF-powered blueprint with a flexible-content page builder, component/section architecture, and a modern CSS design-token system.
+Version:           1.0.0
+Requires at least: 6.4
+Tested up to:      6.8
+Requires PHP:      8.1
+License:           GNU General Public License v2 or later
+License URI:       http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain:       co
+Tags:              custom-theme, acf, page-builder, starter
+*/
+
+/*
+ * All styles are enqueued from /assets/css/.
+ * This file exists only to register the theme with WordPress.
+ */

@@ -1,0 +1,93 @@
+/* ==========================================================================
+   Cypher One — design tokens
+   The single source of truth. Components never hardcode values;
+   re-skin an entire project by editing this file only.
+   ========================================================================== */
+
+:root {
+	/* ---- Color: brand ---------------------------------------------------
+	   Narrative House defaults: ink + paper + garnet.
+	   Override per project — everything downstream follows. */
+	--color-ink:        #1c2230; /* near-black blue: headings, footer */
+	--color-ink-soft:   #3a4356; /* body text */
+	--color-paper:      #faf8f4; /* page background */
+	--color-surface:    #ffffff; /* cards, raised panels */
+	--color-accent:     #8a2d3b; /* garnet: links, buttons, focus */
+	--color-accent-ink: #5e1e29; /* accent hover / active */
+	--color-line:       #e4dfd6; /* hairlines, borders */
+	--color-muted:      #6e7686; /* captions, meta */
+
+	/* ---- Color: semantic aliases (consume these, not the brand ramps) -- */
+	--bg-page:      var(--color-paper);
+	--bg-surface:   var(--color-surface);
+	--bg-inverse:   var(--color-ink);
+	--text-primary: var(--color-ink);
+	--text-body:    var(--color-ink-soft);
+	--text-muted:   var(--color-muted);
+	--text-inverse: var(--color-paper);
+	--text-link:    var(--color-accent);
+	--border:       var(--color-line);
+
+	/* ---- Typography ----------------------------------------------------
+	   Starter ships system stacks; swap in project webfonts here. */
+	--font-display: georgia, "Times New Roman", serif;
+	--font-body: -apple-system, blinkmacsystemfont, "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
+	--font-mono: ui-monospace, sfmono-regular, menlo, consolas, monospace;
+
+	/* Fluid type scale — minor third, clamps between 360px and 1280px. */
+	--text-sm:  clamp(0.83rem, 0.80rem + 0.15vw, 0.94rem);
+	--text-base: clamp(1.00rem, 0.96rem + 0.22vw, 1.13rem);
+	--text-md:  clamp(1.20rem, 1.13rem + 0.33vw, 1.42rem);
+	--text-lg:  clamp(1.44rem, 1.32rem + 0.55vw, 1.80rem);
+	--text-xl:  clamp(1.73rem, 1.52rem + 0.93vw, 2.28rem);
+	--text-2xl: clamp(2.07rem, 1.73rem + 1.55vw, 2.99rem);
+	--text-3xl: clamp(2.49rem, 1.94rem + 2.47vw, 3.95rem);
+
+	--leading-tight: 1.15;
+	--leading-body:  1.65;
+	--tracking-wide: 0.08em;
+
+	/* ---- Spacing (4px base) --------------------------------------------- */
+	--space-2xs: 0.25rem;
+	--space-xs:  0.5rem;
+	--space-sm:  0.75rem;
+	--space-md:  1rem;
+	--space-lg:  1.5rem;
+	--space-xl:  2.5rem;
+	--space-2xl: 4rem;
+	--space-3xl: clamp(4rem, 3rem + 5vw, 7rem); /* section rhythm */
+
+	/* ---- Layout ---------------------------------------------------------- */
+	--width-content: 44rem;   /* prose measure */
+	--width-wide:    75rem;   /* section container */
+	--gutter:        clamp(1rem, 4vw, 2.5rem);
+
+	/* ---- Shape & elevation ---------------------------------------------- */
+	--radius-sm: 4px;
+	--radius-md: 8px;
+	--radius-lg: 16px;
+	--shadow-sm: 0 1px 2px rgb(28 34 48 / 6%);
+	--shadow-md: 0 6px 24px rgb(28 34 48 / 8%);
+
+	/* ---- Motion ----------------------------------------------------------- */
+	--ease: cubic-bezier(0.22, 1, 0.36, 1);
+	--speed: 200ms;
+}
+
+/* Sections rendered on an inverse (ink) background flip their local tokens.
+   Any component dropped inside stays readable with zero extra CSS. */
+.is-inverse {
+	--bg-page:      var(--color-ink);
+	--bg-surface:   #262d3d;
+	--text-primary: var(--color-paper);
+	--text-body:    #cfd4de;
+	--text-muted:   #98a0b0;
+	--text-link:    #e2aab2;
+	--border:       #3a4356;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--speed: 0ms;
+	}
+}
