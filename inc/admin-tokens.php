@@ -87,6 +87,8 @@ function co_access_admin_page(): void {
 			<?php co_access_render_issued( $issued, $apps ); ?>
 		<?php endif; ?>
 
+		<?php co_access_render_file_status( $apps ); ?>
+
 		<h2><?php esc_html_e( 'Issue a token', 'co' ); ?></h2>
 		<form method="post">
 			<?php wp_nonce_field( 'co_access_admin' ); ?>
@@ -137,6 +139,65 @@ function co_access_admin_page(): void {
 		<?php co_access_render_table( co_access_get_tokens(), $apps ); ?>
 	</div>
 	<?php
+}
+
+/**
+ * Report each app file's presence and direct-access protection.
+ *
+ * The guard line is what stops the raw document being downloaded straight
+ * from wp-content, so a re-export dropped in without it silently reopens
+ * that hole. Loud rather than subtle on purpose.
+ *
+ * @param array $apps App registry.
+ */
+function co_access_render_file_status( array $apps ): void {
+	$rows = array();
+
+	foreach ( $apps as $key => $app ) {
+		$rows[ $key ] = co_app_file_status( $app + array( 'key' => $key ) );
+	}
+
+	if ( ! in_array( 'missing', $rows, true ) && ! in_array( 'unguarded', $rows, true ) ) {
+		return;
+	}
+
+	foreach ( $rows as $key => $status ) {
+		if ( 'ok' === $status ) {
+			continue;
+		}
+
+		$title = $apps[ $key ]['title'];
+		$file  = $apps[ $key ]['file'];
+		?>
+		<div class="notice notice-error">
+			<?php if ( 'missing' === $status ) : ?>
+				<p>
+					<strong><?php echo esc_html( $title ); ?></strong> —
+					<?php
+					printf(
+						/* translators: %s: file path inside the theme. */
+						esc_html__( 'the file %s is missing, so this tool cannot be served.', 'co' ),
+						'<code>' . esc_html( $file ) . '</code>'
+					);
+					?>
+				</p>
+			<?php else : ?>
+				<p>
+					<strong><?php echo esc_html( $title ); ?></strong> —
+					<?php
+					printf(
+						/* translators: %s: file path inside the theme. */
+						esc_html__( '%s is missing its guard line, so anyone can download it directly and skip the token gate.', 'co' ),
+						'<code>' . esc_html( $file ) . '</code>'
+					);
+					?>
+				</p>
+				<p><?php esc_html_e( 'Add this as the very first line of the file, then reload:', 'co' ); ?></p>
+				<p><code>&lt;?php http_response_code( 403 ); exit; /* CO_APP_GUARD */ ?&gt;</code></p>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
 }
 
 /**

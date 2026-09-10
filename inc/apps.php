@@ -11,6 +11,16 @@
  * A page is turned into an app by setting the _co_app meta (Page → "Gated
  * app" box). The theme then takes the request over entirely.
  *
+ * The app files carry a .php extension and open with a one-line guard:
+ *
+ *     <?php http_response_code( 403 ); exit; ... ?>
+ *
+ * so a direct hit on the file is answered with 403 by PHP itself, on any web
+ * server, with no host configuration. The guard is unconditional: these
+ * files are never meant to serve themselves. Everything after that line is
+ * the untouched export, and co_app_serve() strips the guard and streams the
+ * rest verbatim, so the body is never parsed or executed as PHP.
+ *
  * @package co
  */
 
@@ -27,12 +37,12 @@ function co_apps(): array {
 		array(
 			'smart-ai-readiness'  => array(
 				'title' => __( 'Smart AI Readiness', 'co' ),
-				'file'  => 'apps/smart-ai-readiness.html',
+				'file'  => 'apps/smart-ai-readiness.php',
 				'blurb' => __( 'A board-ready view of how prepared your organisation is to adopt AI — across strategy, leadership, people, data, technology, process, value and trust. About ten minutes.', 'co' ),
 			),
 			'smart-ai-governance' => array(
 				'title' => __( 'Smart AI Governance', 'co' ),
-				'file'  => 'apps/smart-ai-governance.html',
+				'file'  => 'apps/smart-ai-governance.php',
 				'blurb' => __( 'Assess and structure the governance your AI programme needs — controls, accountability, risk posture and the evidence a regulator or board will ask for.', 'co' ),
 			),
 		)
@@ -233,10 +243,68 @@ function co_app_serve( array $app ): void {
 	header( 'X-Robots-Tag: noindex, nofollow', true );
 	header( 'Referrer-Policy: no-referrer' );
 
+	// Read rather than include: the guard's whole purpose is served by the
+	// file extension, and reading keeps a 600KB export out of the PHP parser.
 	$html = (string) file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions -- local theme file, not a remote request.
 
-	echo co_app_inject_bar( $html, $app ); // phpcs:ignore WordPress.Security.EscapeOutput -- the app document is trusted theme source.
+	echo co_app_inject_bar( co_app_strip_guard( $html ), $app ); // phpcs:ignore WordPress.Security.EscapeOutput -- the app document is trusted theme source.
 	exit;
+}
+
+/**
+ * Remove the leading PHP guard so the response is the original export.
+ *
+ * Only a guard on the very first line is removed, and only up to its first
+ * closing tag, so nothing in the document body can be swallowed.
+ *
+ * @param string $html Raw file contents.
+ * @return string
+ */
+function co_app_strip_guard( string $html ): string {
+	if ( 0 !== strncmp( $html, '<?php', 5 ) ) {
+		return $html;
+	}
+
+	$close = strpos( $html, '?>' );
+
+	if ( false === $close ) {
+		return $html;
+	}
+
+	$html = substr( $html, $close + 2 );
+
+	// PHP itself eats a single newline after a closing tag; match that so the
+	// served bytes are identical to the export.
+	if ( 0 === strncmp( $html, "\r\n", 2 ) ) {
+		return substr( $html, 2 );
+	}
+
+	if ( "\n" === substr( $html, 0, 1 ) || "\r" === substr( $html, 0, 1 ) ) {
+		return substr( $html, 1 );
+	}
+
+	return $html;
+}
+
+/**
+ * Protection state of an app's file on disk.
+ *
+ * A re-exported tool dropped in without its guard line would be directly
+ * downloadable, bypassing the gate, so the admin screen surfaces this.
+ *
+ * @param array $app App definition.
+ * @return string 'missing', 'unguarded' or 'ok'.
+ */
+function co_app_file_status( array $app ): string {
+	$file = get_theme_file_path( $app['file'] );
+
+	if ( ! file_exists( $file ) ) {
+		return 'missing';
+	}
+
+	$head = (string) file_get_contents( $file, false, null, 0, 256 ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+	return str_contains( $head, 'CO_APP_GUARD' ) ? 'ok' : 'unguarded';
 }
 
 /**

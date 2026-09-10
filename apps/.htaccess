@@ -1,9 +1,9 @@
-# Block direct access to the gated app files.
+# Defence in depth for the gated app files.
 #
-# These documents must only ever be served through the theme's access
-# gate (inc/apps.php). Apache honours this file; nginx does NOT — see
-# the nginx block in inc/access.php's header comment and add it to the
-# server config by hand.
+# Primary protection is the guard line inside each app .php file, which
+# answers a direct request with 403 on any web server, with no host
+# configuration. This file adds an Apache-level block on top; nginx ignores
+# it, which is fine — the guard already covers that case.
 
 <IfModule mod_authz_core.c>
 	Require all denied

@@ -1,3 +1,4 @@
+<?php http_response_code( 403 ); exit; /* CO_APP_GUARD - direct access blocked; this file is served only through inc/apps.php */ ?>
 <!doctype html>
 <html lang="en">
 <head>

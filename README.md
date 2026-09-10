@@ -87,9 +87,9 @@ Two self-contained assessment apps ship in `apps/` and are served behind a
 
 ```
 apps/
-├── .htaccess                    denies direct access (Apache only — see below)
-├── smart-ai-readiness.html      Smart AI Readiness   (Assessment v1.10)
-└── smart-ai-governance.html     Smart AI Governance  (QAGI build 43)
+├── .htaccess                   Apache-level block (defence in depth)
+├── smart-ai-readiness.php      Smart AI Readiness   (Assessment v1.10)
+└── smart-ai-governance.php     Smart AI Governance  (QAGI build 43)
 ```
 
 ### How it works
@@ -139,23 +139,39 @@ send that request straight from the gate. Change the address with:
 add_filter( 'co_access_contact_email', fn() => 'hello@example.com' );
 ```
 
-### ⚠️ nginx: one manual step
+### Why the app files are .php
 
-`apps/.htaccess` blocks direct access to the raw files on Apache. **nginx
-ignores it**, which would leave the apps readable at
-`/wp-content/themes/co/apps/smart-ai-readiness.html`, bypassing the gate.
-On nginx (including LocalWP's default) add:
+Serving the exports as `.html` would leave them downloadable straight from
+`/wp-content/themes/co/apps/`, skipping the gate entirely. Blocking that at
+the web server needs different config per server — and none at all on managed
+hosting — so the block lives in the file instead. Each app file is a `.php`
+whose first line is:
 
-```nginx
-location ~* /wp-content/themes/co/apps/.*\.html$ {
-    deny all;
-}
+```php
+<?php http_response_code( 403 ); exit; /* CO_APP_GUARD */ ?>
 ```
+
+A direct request is answered `403` with an empty body by PHP itself, on
+Apache, nginx and managed hosts alike, with nothing to configure. Everything
+after that line is the untouched export: `co_app_serve()` reads the file,
+strips the guard and streams the rest, so the response is byte-identical to
+the original document and the body is never parsed as PHP.
 
 ### Updating an app
 
-Drop the new export over the existing file, keeping the filename. Nothing
-else changes. To register a third tool, filter `co_apps`.
+Drop the new export in as `apps/<name>.php`, keeping the filename, then **add
+the guard line back as line 1** — an export straight out of the tool will not
+have it. From a shell:
+
+```bash
+cd apps
+printf '%s\n' '<?php http_response_code( 403 ); exit; /* CO_APP_GUARD */ ?>' | \
+  cat - new-export.html > smart-ai-readiness.php
+```
+
+If you forget, **Tools → App access** shows a red warning naming the file —
+it checks each app's first bytes for the guard on every load. To register a
+third tool, filter `co_apps`.
 
 ## Production notes
 
