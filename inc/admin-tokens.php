@@ -91,6 +91,7 @@ function co_access_admin_page(): void {
 		<?php endif; ?>
 
 		<?php co_access_render_file_status( $apps ); ?>
+		<?php co_access_render_page_status( $apps ); ?>
 
 		<h2><?php esc_html_e( 'Issue a token', 'co' ); ?></h2>
 		<form method="post">
@@ -141,6 +142,76 @@ function co_access_admin_page(): void {
 		<h2><?php esc_html_e( 'Issued tokens', 'co' ); ?></h2>
 		<?php co_access_render_table( co_access_get_tokens(), $apps ); ?>
 	</div>
+	<?php
+}
+
+/**
+ * Show which page serves each tool, and whether it is wired up.
+ *
+ * A menu item pointing at a page without the _co_app meta renders as an
+ * ordinary empty page — no gate, no tool — which is indistinguishable from
+ * "it is broken" unless you know to look for the meta.
+ *
+ * @param array $apps App registry.
+ */
+function co_access_render_page_status( array $apps ): void {
+	$pages = (array) get_option( 'co_app_pages', array() );
+	?>
+	<h2><?php esc_html_e( 'Tool pages', 'co' ); ?></h2>
+	<table class="widefat striped">
+		<thead>
+			<tr>
+				<th><?php esc_html_e( 'Tool', 'co' ); ?></th>
+				<th><?php esc_html_e( 'Page', 'co' ); ?></th>
+				<th><?php esc_html_e( 'Wired up', 'co' ); ?></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+		<?php foreach ( $apps as $key => $app ) : ?>
+			<?php
+			$page_id = (int) ( $pages[ $key ] ?? 0 );
+			$status  = $page_id ? get_post_status( $page_id ) : false;
+			$wired   = $page_id && $key === get_post_meta( $page_id, '_co_app', true );
+			?>
+			<tr>
+				<td><strong><?php echo esc_html( $app['title'] ); ?></strong></td>
+				<td>
+					<?php if ( 'publish' === $status ) : ?>
+						<a href="<?php echo esc_url( (string) get_permalink( $page_id ) ); ?>">
+							<?php echo esc_html( (string) get_the_title( $page_id ) ); ?>
+						</a>
+					<?php elseif ( $status ) : ?>
+						<?php echo esc_html( sprintf( /* translators: %s: post status. */ __( 'Page exists but is %s', 'co' ), $status ) ); ?>
+					<?php else : ?>
+						<em><?php esc_html_e( 'No page', 'co' ); ?></em>
+					<?php endif; ?>
+				</td>
+				<td>
+					<?php if ( $wired ) : ?>
+						<span style="color:#1a7f37;font-weight:600"><?php esc_html_e( 'Yes', 'co' ); ?></span>
+					<?php else : ?>
+						<span style="color:#b32d2e;font-weight:600"><?php esc_html_e( 'No', 'co' ); ?></span>
+					<?php endif; ?>
+				</td>
+				<td>
+					<?php if ( $page_id ) : ?>
+						<a href="<?php echo esc_url( (string) get_edit_post_link( $page_id ) ); ?>"><?php esc_html_e( 'Edit page', 'co' ); ?></a>
+						<?php if ( 'publish' === $status && $wired ) : ?>
+							&nbsp;·&nbsp;
+							<a href="<?php echo esc_url( add_query_arg( 'co_gate', '1', (string) get_permalink( $page_id ) ) ); ?>">
+								<?php esc_html_e( 'Preview the gate', 'co' ); ?>
+							</a>
+						<?php endif; ?>
+					<?php endif; ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+	<p class="description">
+		<?php esc_html_e( 'A page is wired up by choosing the tool in the "Gated app" box on its edit screen. Menu links must point at these pages — a different page with the same name will render empty. Signed-in editors skip the gate, so use "Preview the gate" or a private window to see what visitors get.', 'co' ); ?>
+	</p>
 	<?php
 }
 

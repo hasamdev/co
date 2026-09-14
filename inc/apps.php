@@ -188,7 +188,13 @@ function co_app_template_include( string $template ): string {
 		return $template;
 	}
 
-	if ( co_access_can_view( $app['key'] ) ) {
+	// Editors bypass the gate so they can preview the tool without spending a
+	// code — which also means they never see the gate by accident. ?co_gate=1
+	// forces it for them, so it can be checked without logging out.
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- display-only preview toggle, gated on capability.
+	$preview_gate = isset( $_GET['co_gate'] ) && current_user_can( 'edit_pages' );
+
+	if ( ! $preview_gate && co_access_can_view( $app['key'] ) ) {
 		co_app_serve( $app ); // Exits.
 	}
 
@@ -338,6 +344,7 @@ function co_app_inject_bar( string $html, array $app ): string {
 
 	$expires = co_access_session_expires();
 	$note    = '';
+	$preview = '';
 
 	if ( $expires ) {
 		$note = sprintf(
@@ -345,6 +352,10 @@ function co_app_inject_bar( string $html, array $app ): string {
 			__( 'Access expires %s', 'co' ),
 			wp_date( get_option( 'time_format' ) . ', ' . get_option( 'date_format' ), $expires )
 		);
+	} elseif ( current_user_can( 'edit_pages' ) ) {
+		// No token, yet the app rendered: this is the editor bypass.
+		$note    = __( 'Signed in — visitors see the access gate', 'co' );
+		$preview = add_query_arg( 'co_gate', '1', co_app_url( $app['key'] ) );
 	}
 
 	ob_start();
@@ -353,6 +364,9 @@ function co_app_inject_bar( string $html, array $app ): string {
 	<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo esc_html__( '← Cypher-One', 'co' ); ?></a>
 	<?php if ( $note ) : ?>
 		<span><?php echo esc_html( $note ); ?></span>
+	<?php endif; ?>
+	<?php if ( $preview ) : ?>
+		<a href="<?php echo esc_url( $preview ); ?>"><?php echo esc_html__( 'Preview it', 'co' ); ?></a>
 	<?php endif; ?>
 </div>
 <style>

@@ -65,6 +65,12 @@ get_header();
 <article class="co-gate" id="co-gate">
 	<div class="container container--narrow">
 
+		<?php if ( current_user_can( 'edit_pages' ) ) : ?>
+			<div class="co-gate__notice co-gate__notice--info" role="status">
+				<?php esc_html_e( 'Preview — you are signed in, so you normally skip this and go straight to the tool. This is what a visitor sees.', 'co' ); ?>
+			</div>
+		<?php endif; ?>
+
 		<p class="co-gate__eyebrow"><?php esc_html_e( 'Protected tool', 'co' ); ?></p>
 		<h1 class="co-gate__title"><?php echo esc_html( $co_app['title'] ); ?></h1>
 
