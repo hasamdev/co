@@ -27,20 +27,11 @@ body.home {
 }
 
 /* --- Site header over the gradient --------------------------------------
-   Fully transparent, so the canvas runs uninterrupted behind it. The three
-   properties below each undo a default from main.css — without all three
-   the light glass bar shows through.
-
-   The body gradient is background-attachment: fixed, so the area behind the
-   sticky header is always the bright aqua at the top of the canvas, never
-   the darker end. Contents are white to match the hero, with a soft shadow
-   so they hold up against that brightness. */
-body.home .site-header {
-	background: transparent;
-	backdrop-filter: none;
-	border-block-end: 0;
-}
-
+   The header is transparent everywhere (see main.css); here it only needs
+   its contents recoloured. The body gradient is background-attachment:
+   fixed, so the area behind the sticky header is always the bright aqua at
+   the top of the canvas, never the darker end — hence white with a soft
+   shadow to hold up against that brightness. */
 body.home .site-header__inner {
 	text-shadow: 0 1px 3px rgb(9 20 38 / 38%);
 }

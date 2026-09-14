@@ -8,7 +8,14 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Version string for an asset: filemtime in dev, theme version otherwise.
+ * Version string for an asset: its modification time.
+ *
+ * This used to fall back to the theme version whenever WP_DEBUG was off.
+ * Since the theme version is a literal in style.css that nobody remembers
+ * to bump, that pinned every asset at 1.0.0 forever — edit a stylesheet and
+ * returning visitors keep the old one until they hard-refresh. filemtime is
+ * a stat call that PHP caches per request, so paying it always is cheaper
+ * than shipping changes nobody can see.
  *
  * @param string $relative_path Path relative to the theme root.
  * @return string
@@ -16,7 +23,7 @@ defined( 'ABSPATH' ) || exit;
 function co_asset_version( string $relative_path ): string {
 	$file = CO_THEME_DIR . '/' . ltrim( $relative_path, '/' );
 
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && file_exists( $file ) ) {
+	if ( file_exists( $file ) ) {
 		return (string) filemtime( $file );
 	}
 
