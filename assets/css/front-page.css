@@ -196,6 +196,32 @@ body.home .site-footer .co-brand {
 	gap: clamp(1.25rem, 3vw, 2rem);
 }
 
+/* Primary menu, standing in for the hidden site header on this page.
+   Links are white here rather than the token ink used elsewhere, because
+   the hero sits on the dark gradient. */
+.co-hero .nav {
+	inline-size: 100%;
+}
+
+.co-hero .nav__list {
+	justify-content: center;
+	gap: clamp(0.85rem, 2.5vw, 2.25rem);
+}
+
+.co-hero .nav__list a {
+	color: rgb(255 255 255 / 86%);
+	font-size: clamp(0.9rem, 0.86rem + 0.2vw, 1rem);
+	font-weight: 600;
+}
+
+.co-hero .nav__list a:hover,
+.co-hero .nav__list a:focus-visible,
+.co-hero .nav__list .current-menu-item > a {
+	color: #fff;
+	text-decoration: underline;
+	text-underline-offset: 5px;
+}
+
 .co-hero__title {
 	max-inline-size: 18ch;
 	margin: 0;
