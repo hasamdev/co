@@ -27,14 +27,22 @@ body.home {
 }
 
 /* --- Site header over the gradient --------------------------------------
-   The header is sticky on this page like any other, but the page canvas
-   runs from bright aqua at the top to near-black at the bottom, so the
-   default light glass bar is swapped for dark glass with white contents.
-   That stays legible across the whole scroll instead of only part of it. */
+   Fully transparent, so the canvas runs uninterrupted behind it. The three
+   properties below each undo a default from main.css — without all three
+   the light glass bar shows through.
+
+   The body gradient is background-attachment: fixed, so the area behind the
+   sticky header is always the bright aqua at the top of the canvas, never
+   the darker end. Contents are white to match the hero, with a soft shadow
+   so they hold up against that brightness. */
 body.home .site-header {
-	background: rgb(9 20 38 / 55%);
-	backdrop-filter: blur(14px) saturate(140%);
-	border-block-end: 1px solid rgb(255 255 255 / 14%);
+	background: transparent;
+	backdrop-filter: none;
+	border-block-end: 0;
+}
+
+body.home .site-header__inner {
+	text-shadow: 0 1px 3px rgb(9 20 38 / 38%);
 }
 
 body.home .site-brand {
@@ -46,7 +54,7 @@ body.home .site-brand:hover {
 }
 
 body.home .nav__list a {
-	color: rgb(255 255 255 / 86%);
+	color: #fff;
 	font-weight: 600;
 }
 
