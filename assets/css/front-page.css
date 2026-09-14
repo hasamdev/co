@@ -26,8 +26,36 @@ body.home {
 	background-attachment: fixed;
 }
 
+/* --- Site header over the gradient --------------------------------------
+   The header is sticky on this page like any other, but the page canvas
+   runs from bright aqua at the top to near-black at the bottom, so the
+   default light glass bar is swapped for dark glass with white contents.
+   That stays legible across the whole scroll instead of only part of it. */
 body.home .site-header {
-	display: none;
+	background: rgb(9 20 38 / 55%);
+	backdrop-filter: blur(14px) saturate(140%);
+	border-block-end: 1px solid rgb(255 255 255 / 14%);
+}
+
+body.home .site-brand {
+	color: #fff;
+}
+
+body.home .site-brand:hover {
+	color: rgb(255 255 255 / 78%);
+}
+
+body.home .nav__list a {
+	color: rgb(255 255 255 / 86%);
+	font-weight: 600;
+}
+
+body.home .nav__list a:hover,
+body.home .nav__list a:focus-visible,
+body.home .nav__list .current-menu-item > a {
+	color: #fff;
+	text-decoration: underline;
+	text-underline-offset: 5px;
 }
 
 /* --- Background video layer (Framer "video hero bg" equivalent) ----------- */
@@ -194,32 +222,6 @@ body.home .site-footer .co-brand {
 	display: grid;
 	justify-items: center;
 	gap: clamp(1.25rem, 3vw, 2rem);
-}
-
-/* Primary menu, standing in for the hidden site header on this page.
-   Links are white here rather than the token ink used elsewhere, because
-   the hero sits on the dark gradient. */
-.co-hero .nav {
-	inline-size: 100%;
-}
-
-.co-hero .nav__list {
-	justify-content: center;
-	gap: clamp(0.85rem, 2.5vw, 2.25rem);
-}
-
-.co-hero .nav__list a {
-	color: rgb(255 255 255 / 86%);
-	font-size: clamp(0.9rem, 0.86rem + 0.2vw, 1rem);
-	font-weight: 600;
-}
-
-.co-hero .nav__list a:hover,
-.co-hero .nav__list a:focus-visible,
-.co-hero .nav__list .current-menu-item > a {
-	color: #fff;
-	text-decoration: underline;
-	text-underline-offset: 5px;
 }
 
 .co-hero__title {

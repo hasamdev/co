@@ -1,6 +1,9 @@
 <?php
 /**
- * Front page: hero with brand mark, headline and partner logo strip.
+ * Front page: headline, sub-headline and partner logo strip.
+ *
+ * The brand mark lives in the site header, which is shown on this page like
+ * any other — see front-page.css for its treatment on the dark gradient.
  *
  * @package co
  */
@@ -12,27 +15,6 @@ $co_sub     = co_field( 'co_hero_subheading', __( 'We help organizations build t
 ?>
 <section class="co-hero">
 	<div class="container co-hero__inner">
-
-		<?php
-		/* The global site header is hidden on the front page (see
-		   front-page.css), so the primary menu is rendered here instead —
-		   above the brand mark. */
-		co_component(
-			'nav',
-			array(
-				'location' => 'primary',
-				'label'    => __( 'Primary navigation', 'co' ),
-			)
-		);
-		?>
-
-		<?php if ( has_custom_logo() ) : ?>
-			<?php the_custom_logo(); ?>
-		<?php else : ?>
-			<a class="site-brand" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
-				<?php bloginfo( 'name' ); ?>
-			</a>
-		<?php endif; ?>
 
 		<h1 class="co-hero__title"><?php echo esc_html( $co_heading ); ?></h1>
 
