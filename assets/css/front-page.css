@@ -57,10 +57,19 @@ body.home .nav__list .current-menu-item > a {
 	text-underline-offset: 5px;
 }
 
-/* --- Background video layer (Framer "video hero bg" equivalent) ----------- */
-body.home .site-main {
+/* --- Background video layer (Framer "video hero bg" equivalent) -----------
+   The containing block is .site, which wraps the header as well as the
+   content — so the video spans from the very top of the page and plays
+   behind the transparent header rather than starting beneath it.
+
+   This used to sit on .site-main, which had two problems: it began below
+   the header, and `isolation: isolate` created a stacking context that
+   trapped the video's z-index:-1 inside it, so no amount of margin could
+   have lifted the video behind the header. .site is positioned but has no
+   z-index, so it forms no stacking context and the video stays behind all
+   content while the sticky header (z-index 50) paints over it. */
+body.home .site {
 	position: relative;
-	isolation: isolate;
 }
 
 .co-video-bg {
