@@ -97,15 +97,60 @@ function co_app_for_query(): ?array {
  * @return string Empty when no page is attached.
  */
 function co_app_url( string $key ): string {
-	$pages = get_option( 'co_app_pages', array() );
+	$pages   = (array) get_option( 'co_app_pages', array() );
+	$page_id = (int) ( $pages[ $key ] ?? 0 );
 
-	if ( empty( $pages[ $key ] ) ) {
+	/*
+	 * The recorded id goes stale easily: pages built by hand were never
+	 * recorded at all, a deleted and recreated page changes id, and the meta
+	 * can be moved to a different page. Relying on the option alone meant
+	 * co_app_url() returned an empty string and the emailed button quietly
+	 * lost its href. Re-resolve and heal the record instead.
+	 */
+	if ( ! $page_id || $key !== get_post_meta( $page_id, '_co_app', true ) ) {
+		$page_id = co_app_find_page( $key );
+
+		if ( $page_id ) {
+			$pages[ $key ] = $page_id;
+			update_option( 'co_app_pages', $pages, false );
+		}
+	}
+
+	if ( ! $page_id || 'publish' !== get_post_status( $page_id ) ) {
 		return '';
 	}
 
-	$link = get_permalink( (int) $pages[ $key ] );
+	$link = get_permalink( $page_id );
 
 	return $link ? $link : '';
+}
+
+/**
+ * Locate the page serving an app: by its meta first, then by slug.
+ *
+ * @param string $key App key.
+ * @return int Page ID, or 0 when nothing matches.
+ */
+function co_app_find_page( string $key ): int {
+	$found = get_posts(
+		array(
+			'post_type'        => 'page',
+			'post_status'      => 'publish',
+			'numberposts'      => 1,
+			'fields'           => 'ids',
+			'meta_key'         => '_co_app', // phpcs:ignore WordPress.DB.SlowDBQuery -- rare, and the alternative is a broken link.
+			'meta_value'       => $key,      // phpcs:ignore WordPress.DB.SlowDBQuery
+			'suppress_filters' => false,
+		)
+	);
+
+	if ( $found ) {
+		return (int) $found[0];
+	}
+
+	$by_slug = get_page_by_path( $key );
+
+	return $by_slug ? (int) $by_slug->ID : 0;
 }
 
 /* -------------------------------------------------------------------------

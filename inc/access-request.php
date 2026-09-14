@@ -185,15 +185,24 @@ function co_access_send_token_email( string $email, string $name, array $issued,
 		</p>
 
 		<?php if ( $link ) : ?>
-			<p style="margin:28px 0">
-				<a href="<?php echo esc_url( $link ); ?>"
-					style="display:inline-block;padding:13px 26px;background:#1b6fc4;color:#fff;border-radius:8px;
-					text-decoration:none;font-weight:600">
-					<?php esc_html_e( 'Open the tool', 'co' ); ?>
-				</a>
+			<?php // Kept on one line: a wrapped tag is one more thing for an email client's HTML rewriter to mangle. ?>
+			<p style="margin:28px 0"><a href="<?php echo esc_url( $link ); ?>" style="display:inline-block;padding:13px 26px;background:#1b6fc4;color:#fff;border-radius:8px;text-decoration:none;font-weight:600"><?php esc_html_e( 'Open the tool', 'co' ); ?></a></p>
+
+			<?php
+			/*
+			 * The address in full, as text as well as a link. Plenty of
+			 * clients strip styled anchors or render the message as plain
+			 * text, which leaves a button that looks real and goes nowhere.
+			 * A visible URL still gets the recipient in.
+			 */
+			?>
+			<p style="font-size:14px;line-height:1.5;color:#6a7a8c;word-break:break-all">
+				<?php esc_html_e( 'If the button does not work, copy this address into your browser:', 'co' ); ?><br>
+				<a href="<?php echo esc_url( $link ); ?>" style="color:#1b6fc4"><?php echo esc_html( $link ); ?></a>
 			</p>
-			<p style="font-size:14px;color:#6a7a8c">
-				<?php esc_html_e( 'That button signs you in automatically. If it does not work, open the tool and enter the code above.', 'co' ); ?>
+		<?php else : ?>
+			<p style="font-size:14px;line-height:1.5;color:#6a7a8c">
+				<?php esc_html_e( 'Open the tool on our website and enter the code above.', 'co' ); ?>
 			</p>
 		<?php endif; ?>
 
