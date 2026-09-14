@@ -26,45 +26,10 @@
 
 .co-gate__lede {
 	max-width: 62ch;
-	margin: 0 0 var(--space-xl);
+	margin: 0 0 var(--space-lg);
 	font-size: var(--text-md);
 	line-height: var(--leading-body);
 	color: var(--text-muted);
-}
-
-.co-gate__grid {
-	display: grid;
-	gap: var(--space-lg);
-	grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
-	align-items: start;
-}
-
-.co-gate__panel {
-	padding: var(--space-lg);
-	border: 1px solid var(--border);
-	border-radius: var(--radius-lg);
-	background: var(--bg-surface);
-	box-shadow: var(--shadow-sm);
-}
-
-.co-gate__panel--unlock {
-	border-color: var(--color-accent);
-}
-
-.co-gate__panel h2 {
-	margin: 0 0 var(--space-xs);
-	font-family: var(--font-display);
-	font-size: var(--text-lg);
-	line-height: var(--leading-tight);
-}
-
-.co-gate__panel > p {
-	margin: 0 0 var(--space-md);
-	color: var(--text-muted);
-}
-
-.co-gate__form {
-	margin: 0;
 }
 
 .co-gate__label {
@@ -135,4 +100,129 @@
 	width: 1px;
 	height: 1px;
 	overflow: hidden;
+}
+
+/* ---- Holding page behind the modal ----------------------------------- */
+
+.co-gate__reopen {
+	margin: 0;
+}
+
+/* ---- Modal ------------------------------------------------------------ */
+
+.co-modal {
+	width: min(100% - 2 * var(--space-md), 30rem);
+	max-height: calc(100vh - 2 * var(--space-lg));
+	padding: 0;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	background: var(--bg-surface);
+	color: inherit;
+	box-shadow: var(--shadow-md);
+	overflow: auto;
+}
+
+.co-modal::backdrop {
+	background: rgb(11 31 58 / 62%);
+	backdrop-filter: blur(3px);
+}
+
+/* Without JS the dialog sits in the flow rather than floating. */
+.co-modal[open]:not(:modal) {
+	margin: var(--space-xl) auto;
+}
+
+.co-modal__inner {
+	position: relative;
+	padding: var(--space-xl) var(--space-lg) var(--space-lg);
+}
+
+.co-modal__close {
+	position: absolute;
+	top: var(--space-xs);
+	right: var(--space-xs);
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	border: 0;
+	border-radius: var(--radius-sm);
+	background: none;
+	color: var(--text-muted);
+	font-size: 1.6rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.co-modal__close:hover {
+	background: var(--bg-page);
+	color: var(--text-primary);
+}
+
+.co-modal__eyebrow {
+	margin: 0 0 var(--space-2xs);
+	font-size: var(--text-sm);
+	font-weight: 600;
+	letter-spacing: var(--tracking-wide);
+	text-transform: uppercase;
+	color: var(--color-accent);
+}
+
+.co-modal h2 {
+	margin: 0 0 var(--space-2xs);
+	font-family: var(--font-display);
+	font-size: var(--text-lg);
+	line-height: var(--leading-tight);
+}
+
+.co-modal__lede {
+	margin: 0 0 var(--space-md);
+	font-size: var(--text-sm);
+	line-height: var(--leading-body);
+	color: var(--text-muted);
+}
+
+/* Only the step matching the dialog's data-step is shown. */
+.co-modal__step {
+	display: none;
+}
+
+.co-modal[data-step="email"] [data-step-panel="email"],
+.co-modal[data-step="token"] [data-step-panel="token"] {
+	display: block;
+}
+
+.co-modal__switch {
+	margin: var(--space-md) 0 0;
+	font-size: var(--text-sm);
+	text-align: center;
+}
+
+.co-linkish {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--color-accent);
+	font: inherit;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.co-modal__foot {
+	margin: var(--space-lg) 0 0;
+	padding-top: var(--space-md);
+	border-top: 1px solid var(--border);
+	font-size: var(--text-sm);
+	color: var(--text-muted);
+	text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.co-modal[open] {
+		animation: co-modal-in 180ms ease-out;
+	}
+
+	@keyframes co-modal-in {
+		from { opacity: 0; transform: translateY(6px); }
+		to   { opacity: 1; transform: none; }
+	}
 }

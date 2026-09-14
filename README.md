@@ -103,41 +103,69 @@ screen (post meta `_co_app`). From then on:
 
 | Visitor state | What they get |
 |---|---|
-| No token | The access gate (`template-access-gate.php`) |
+| No token | The access gate, opened as a modal over a holding page |
 | Live token | The app, with a small "← Cypher-One" pill injected |
 | Logged in as editor | The app, no token needed |
 
-Both pages are created automatically on first load of the admin, titled
-**Smart AI Readiness** and **Smart AI Governance**, and added to the Primary
-menu when one is already assigned. Otherwise add them under **Appearance →
-Menus** — they appear in the Pages box.
+Both pages are created on first admin load, titled **Smart AI Readiness** and
+**Smart AI Governance**, and added to the Primary menu. If no menu is
+assigned to that location, one named "Primary" is created (with a Home link)
+and assigned, so the items actually appear rather than silently going
+nowhere.
 
-### Issuing a token
+### The visitor's path
 
-**Tools → App access.** Choose the tool, note who it is for, click *Issue
-token*. You get the token plus a ready-to-send reply containing a magic link:
+The gate is a two-step modal, and **no one has to be at a desk for a prospect
+to get in**:
 
-```
-https://example.com/smart-ai-readiness/?token=ABCD-EFGH-JKLM
-```
+1. **Email step.** They enter their work email (name and organisation
+   optional). A 24-hour code is generated immediately, emailed to them from
+   `contact@cypher-one.ai`, and a copy of the request — without the code — is
+   sent to the same address so the lead is captured.
+2. **Code step.** They paste the code, or just click the button in the email,
+   which carries a magic link that signs them in and strips the token from
+   the URL.
 
-The link signs the recipient in and the token is stripped from the URL
-immediately. Only an HMAC of the token is stored, so **it is shown once and
-cannot be recovered** — copy it before navigating away. If lost, issue another.
+Which step opens is decided server-side from the `?access=` code on the
+redirect, so the flow survives a reload. The dialog starts closed and
+`gate.js` opens it as a true modal; a `<noscript>` stylesheet renders it
+inline when scripting is off, so the gate never becomes a dead end.
+
+Because this hands out credentials to anyone who asks, requests are budgeted
+two ways:
+
+| Limit | Why |
+|---|---|
+| 5 per IP per hour | One visitor cannot mint codes in bulk |
+| 3 per email address per hour | The form cannot be pointed at someone else's inbox |
+| 8 redemption attempts per IP per 15 min | Guessing a code is not viable |
+
+### Issuing a token by hand
+
+**Tools → App access** still issues one directly — useful for a workshop, or
+when someone's mail is bouncing. You get the code plus a ready-to-send reply
+containing the magic link. Only an HMAC is stored, so **it is shown once and
+cannot be recovered**; if lost, issue another.
 
 - **24 hours from issue**, not from first use. The session cookie expires at
   the same instant, so it can never outlive the token.
 - **Revoke is immediate** — every gated request re-reads the row.
-- Multi-use within the window by default, so people can reload or switch
-  device. Set the use limit to `1` to make a token strictly single-use.
-- Failed attempts are throttled to 8 per IP per 15 minutes.
+- Multi-use within the window by default. Set the use limit to `1` to make a
+  token strictly single-use.
 
-Visitors without a token are told to email **contact@cypher-one.ai**, and can
-send that request straight from the gate. Change the address with:
+Change the contact address with:
 
 ```php
 add_filter( 'co_access_contact_email', fn() => 'hello@example.com' );
 ```
+
+> **Mail must actually work.** Both the code and the lead copy go out through
+> `wp_mail()`. On LocalWP, mail is captured by the built-in mailbox rather
+> than delivered — fine for testing. In production, put SMTP behind it and
+> make sure `contact@cypher-one.ai` is authorised to send for the domain
+> (SPF/DKIM), or codes will land in spam. If the send fails the visitor is
+> told so explicitly rather than being left waiting for a code that is never
+> coming.
 
 ### Why the app files are .php
 

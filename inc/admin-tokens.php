@@ -2,7 +2,10 @@
 /**
  * Tools → App access.
  *
- * Issue, review and revoke the 24-hour tokens that unlock the gated apps.
+ * Review and revoke the 24-hour tokens that unlock the gated apps, and issue
+ * one by hand when needed — visitors normally get their own automatically by
+ * submitting the form on the gate.
+ *
  * A token's plaintext exists only in the response that creates it — after
  * that only its HMAC is stored, so copy the email snippet before leaving.
  *
@@ -73,7 +76,7 @@ function co_access_admin_page(): void {
 			<?php
 			printf(
 				/* translators: %s: contact email address. */
-				esc_html__( 'Visitors are told to email %s for access. Issue a token here, then reply to them with the unlock link below.', 'co' ),
+				esc_html__( 'Visitors request their own code on the tool page and it is emailed to them automatically, with a copy of every request sent to %s. Use the form below only to issue one by hand.', 'co' ),
 				esc_html( co_access_contact_email() )
 			);
 			?>

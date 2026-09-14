@@ -439,7 +439,7 @@ function co_app_meta_box_save( int $post_id ): void {
  * First-run setup
  * ---------------------------------------------------------------------- */
 
-const CO_APP_SETUP_VERSION = 1;
+const CO_APP_SETUP_VERSION = 2;
 
 add_action( 'after_switch_theme', 'co_app_create_pages' );
 add_action( 'admin_init', 'co_app_maybe_setup' );
@@ -466,52 +466,143 @@ function co_app_maybe_setup(): void {
  */
 function co_app_create_pages(): void {
 	$pages = (array) get_option( 'co_app_pages', array() );
-	$menu  = wp_get_nav_menu_object( get_nav_menu_locations()['primary'] ?? 0 );
 
 	foreach ( co_apps() as $key => $app ) {
-		if ( ! empty( $pages[ $key ] ) && get_post_status( (int) $pages[ $key ] ) ) {
+		$pages[ $key ] = co_app_ensure_page( $key, $app, $pages[ $key ] ?? 0 );
+	}
+
+	update_option( 'co_app_pages', $pages, false );
+
+	co_app_ensure_menu_items( array_filter( $pages ) );
+}
+
+/**
+ * Return the published page for an app, creating it when needed.
+ *
+ * @param string $key   App key.
+ * @param array  $app   App definition.
+ * @param int    $known Page ID previously recorded, if any.
+ * @return int Page ID, or 0 on failure.
+ */
+function co_app_ensure_page( string $key, array $app, int $known = 0 ): int {
+	if ( $known && 'publish' === get_post_status( $known ) ) {
+		return $known;
+	}
+
+	$existing = get_page_by_path( $key );
+
+	$page_id = $existing
+		? $existing->ID
+		: wp_insert_post(
+			array(
+				'post_type'      => 'page',
+				'post_status'    => 'publish',
+				'post_title'     => $app['title'],
+				'post_name'      => $key,
+				'post_content'   => '',
+				'comment_status' => 'closed',
+				'ping_status'    => 'closed',
+			)
+		);
+
+	if ( is_wp_error( $page_id ) || ! $page_id ) {
+		return 0;
+	}
+
+	update_post_meta( $page_id, '_co_app', $key );
+
+	return (int) $page_id;
+}
+
+/**
+ * Put both tools in the primary menu, creating that menu if there isn't one.
+ *
+ * Adding to a menu only when one already exists meant the items silently
+ * never appeared on a fresh install, which is the case that matters. So a
+ * menu is created and assigned when the primary location is empty.
+ *
+ * @param array $pages App key => page ID.
+ */
+function co_app_ensure_menu_items( array $pages ): void {
+	if ( ! $pages ) {
+		return;
+	}
+
+	$menu = co_app_primary_menu();
+
+	if ( ! $menu ) {
+		return;
+	}
+
+	$apps = co_apps();
+
+	foreach ( $pages as $key => $page_id ) {
+		if ( co_app_menu_has_page( $menu->term_id, (int) $page_id ) ) {
 			continue;
 		}
 
-		$existing = get_page_by_path( $key );
+		wp_update_nav_menu_item(
+			$menu->term_id,
+			0,
+			array(
+				'menu-item-object-id' => (int) $page_id,
+				'menu-item-object'    => 'page',
+				'menu-item-type'      => 'post_type',
+				'menu-item-title'     => $apps[ $key ]['title'] ?? '',
+				'menu-item-status'    => 'publish',
+			)
+		);
+	}
+}
 
-		$page_id = $existing
-			? $existing->ID
-			: wp_insert_post(
-				array(
-					'post_type'      => 'page',
-					'post_status'    => 'publish',
-					'post_title'     => $app['title'],
-					'post_name'      => $key,
-					'post_content'   => '',
-					'comment_status' => 'closed',
-					'ping_status'    => 'closed',
-				)
-			);
+/**
+ * The menu in the primary location, created and assigned if none is set.
+ *
+ * @return WP_Term|null
+ */
+function co_app_primary_menu(): ?WP_Term {
+	$locations = (array) get_nav_menu_locations();
+	$menu      = ! empty( $locations['primary'] ) ? wp_get_nav_menu_object( $locations['primary'] ) : false;
 
-		if ( is_wp_error( $page_id ) || ! $page_id ) {
-			continue;
+	if ( $menu ) {
+		return $menu;
+	}
+
+	// Re-use a menu called "Primary" if one is lying around unassigned,
+	// rather than creating a second one beside it.
+	$menu = wp_get_nav_menu_object( 'Primary' );
+
+	if ( ! $menu ) {
+		$menu_id = wp_create_nav_menu( 'Primary' );
+
+		if ( is_wp_error( $menu_id ) ) {
+			return null;
 		}
 
-		update_post_meta( $page_id, '_co_app', $key );
-		$pages[ $key ] = (int) $page_id;
+		$menu = wp_get_nav_menu_object( $menu_id );
 
-		if ( $menu && ! co_app_menu_has_page( $menu->term_id, (int) $page_id ) ) {
+		if ( $menu ) {
 			wp_update_nav_menu_item(
 				$menu->term_id,
 				0,
 				array(
-					'menu-item-object-id' => (int) $page_id,
-					'menu-item-object'    => 'page',
-					'menu-item-type'      => 'post_type',
-					'menu-item-title'     => $app['title'],
-					'menu-item-status'    => 'publish',
+					'menu-item-title'  => __( 'Home', 'co' ),
+					'menu-item-url'    => home_url( '/' ),
+					'menu-item-type'   => 'custom',
+					'menu-item-status' => 'publish',
 				)
 			);
 		}
 	}
 
-	update_option( 'co_app_pages', $pages, false );
+	if ( ! $menu ) {
+		return null;
+	}
+
+	$locations['primary'] = $menu->term_id;
+	set_theme_mod( 'nav_menu_locations', $locations );
+
+	return $menu;
 }
 
 /**

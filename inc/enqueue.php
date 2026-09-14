@@ -66,6 +66,17 @@ function co_enqueue_assets(): void {
 			array( 'co-main' ),
 			co_asset_version( 'assets/css/gate.css' )
 		);
+
+		wp_enqueue_script(
+			'co-gate',
+			CO_THEME_URI . '/assets/js/gate.js',
+			array(),
+			co_asset_version( 'assets/js/gate.js' ),
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
+		);
 	}
 
 	// Front page (Cypher-One launch layout) only.
